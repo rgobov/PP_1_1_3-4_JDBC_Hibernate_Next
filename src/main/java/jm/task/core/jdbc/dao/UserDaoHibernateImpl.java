@@ -124,6 +124,7 @@ public class UserDaoHibernateImpl implements UserDao {
             List<User> userList = session.createQuery(criteriaQuery).getResultList();
             try {
                 transaction.commit();
+                System.out.println("Список возвращен");
                 return userList;
             } catch (HibernateException e) {
                 transaction.rollback();
@@ -140,8 +141,8 @@ public class UserDaoHibernateImpl implements UserDao {
             Transaction transaction = session.beginTransaction();
             try {
                 session.createNativeQuery("TRUNCATE TABLE mydb.users;").executeUpdate();
-                System.out.println("Таблица очищена");
                 transaction.commit();
+                System.out.println("Таблица очищена");
             } catch (HibernateException e) {
                 transaction.rollback();
                 e.printStackTrace();

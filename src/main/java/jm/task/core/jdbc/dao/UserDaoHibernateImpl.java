@@ -2,10 +2,12 @@ package jm.task.core.jdbc.dao;
 
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
+import javax.persistence.criteria.CriteriaQuery;
 import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
@@ -132,8 +134,22 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public List<User> getAllUsers() {
-        return null;
-    }
+       try (Session session = sf.openSession()){
+
+        CriteriaQuery<User> criteriaQuery = session.getCriteriaBuilder().createQuery(User.class);
+        criteriaQuery.from(User.class);
+        Transaction transaction = session.beginTransaction();
+        List<User> userList = session.createQuery(criteriaQuery).getResultList();
+        try {
+            transaction.commit();
+            return userList;
+        } catch (HibernateException e) {
+            transaction.rollback();
+            e.printStackTrace();
+
+        }
+        return userList;
+    }}
 
     @Override
     public void cleanUsersTable() {

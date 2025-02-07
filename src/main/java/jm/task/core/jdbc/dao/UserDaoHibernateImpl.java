@@ -9,7 +9,12 @@ import org.hibernate.Transaction;
 import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
-    SessionFactory sf = Util.getSessionFactory();
+    private SessionFactory sf;
+    {
+        sf = Util.getSessionFactory();
+
+    }
+
     public UserDaoHibernateImpl() {
 
     }
@@ -79,12 +84,50 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
+        try (Session session = sf.openSession()) {
+            // Начинаем транзакцию
+            Transaction transaction = session.beginTransaction();
 
+            try {
+                session.save(new User(name, lastName, age));
+
+                // Фиксируем транзакцию
+                transaction.commit();
+                System.out.println("Пользователь сохранен");
+            } catch (Exception e) {
+                // Откатываем транзакцию в случае ошибки
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+                e.printStackTrace(); // Логируем ошибку
+            }
+        } catch (Exception e) {
+            e.printStackTrace(); // Логируем ошибку при открытии сессии
+        }
     }
 
     @Override
     public void removeUserById(long id) {
+        try (Session session = sf.openSession()) {
+            // Начинаем транзакцию
+            Transaction transaction = session.beginTransaction();
 
+            try {
+                session.delete(session.get(User.class, id));
+
+                // Фиксируем транзакцию
+                transaction.commit();
+                System.out.println("Пользователь удалён");
+            } catch (Exception e) {
+                // Откатываем транзакцию в случае ошибки
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+                e.printStackTrace(); // Логируем ошибку
+            }
+        } catch (Exception e) {
+            e.printStackTrace(); // Логируем ошибку при открытии сессии
+        }
     }
 
     @Override

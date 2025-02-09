@@ -11,6 +11,7 @@ import java.util.Random;
 
 public class Main {
     public static final UserService userService = new UserServiceImpl();
+
     public static String generateNames() {
         int leftLimit = 97;
         int rightLimit = 122;
@@ -23,17 +24,19 @@ public class Main {
                 .toString();
         return generatedString;
     }
+
     public static List<User> generateUsers() {
         List<User> users = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
             User user = new User();
             user.setName(generateNames());
             user.setLastName(generateNames());
-            user.setAge((byte) (Math.random()*100));
+            user.setAge((byte) (Math.random() * 100));
             users.add(user);
         }
         return users;
     }
+
     public static void main(String[] args) {
         userService.createUsersTable();
         for (User user : generateUsers()) {
